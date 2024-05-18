@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
     private bool CanSlam;
     private float dragSpeed;
     private Animator anim;
+    bool isJumping = false;
 
 
     // Start is called before the first frame update
@@ -38,6 +39,8 @@ public class PlayerController : MonoBehaviour
             jumpsLeft = maxJumps;
             CanSlam = false;
             dragSpeed = -3.5f;
+            bool isJumping = false;
+
 
 
         }
@@ -77,6 +80,7 @@ public class PlayerController : MonoBehaviour
             jumpsLeft -= 1;
             CanSlam = true;
             dragSpeed = 0;
+            isJumping = true;
 
 
 
@@ -90,7 +94,7 @@ public class PlayerController : MonoBehaviour
 
 
         }
-        if(Jump != 0)
+        if(bool isJumping == true)
         {
             anim.SetBool("IsJumping", true);
 
@@ -99,6 +103,7 @@ public class PlayerController : MonoBehaviour
         {
             anim.SetBool("IsJumping", false);
         }
+
 
 
 
