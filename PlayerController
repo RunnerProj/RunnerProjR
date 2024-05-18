@@ -14,7 +14,8 @@ public class PlayerController : MonoBehaviour
     private bool CDTimerOff = true;
     private bool CanSlam;
     private float dragSpeed;
-    private Animator anim;
+    public Animator anim;
+    bool isJumping = false;
 
 
     // Start is called before the first frame update
@@ -71,7 +72,6 @@ public class PlayerController : MonoBehaviour
         Move(15);
 
         //Jump Button
-        KeyCode.W = Input.GetAxisRaw("Vertical");
         if (Input.GetKeyDown(KeyCode.W) && jumpsLeft > 0)
         {
             transform.eulerAngles = new Vector3(0, 0, 0);
@@ -96,7 +96,6 @@ public class PlayerController : MonoBehaviour
         if(isJumping == true)
         {
             anim.SetBool("IsJumping", true);
-
         }
         else
         {
@@ -104,6 +103,107 @@ public class PlayerController : MonoBehaviour
         }
 
 
+
+
+
+
+
+        //Dash Input
+        if (Input.GetKey(KeyCode.Space))
+        {
+            StartCoroutine(Dash(.75f));
+            StartCoroutine(CDTimer());
+
+        }
+
+        //ends the game if the player goes out of bounds
+        if (transform.position.y < -10 || transform.position.x < -15)
+        {
+            gameOver = true;
+        }
+        //locks the character in place once the game ends
+        if (gameOver == true)
+        {
+            movementSpeed = 0;
+            jumpForce = 0;
+            rb.velocity = Vector3.zero;
+            rb.gravityScale = 0;
+        }
+        transform.Translate(dragSpeed * Time.deltaTime, 0, 0);
+
+
+
+
+
+    }
+
+    //Handles horizontal movement and deaccerlation
+    private void Move(int deacceleration)
+    {
+        if (Input.GetKey(KeyCode.D))
+        {
+            movementSpeed += 4 * Time.deltaTime;
+            if (movementSpeed > 7)
+            {
+                movementSpeed = 7;
+            }
+            MoveDirection = 1;
+
+
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            movementSpeed -= 4 * Time.deltaTime;
+
+            if (movementSpeed < -7)
+            {
+                movementSpeed = -7;
+            }
+
+            MoveDirection = -1;
+
+        }
+        //slows the character if no buttons are being pressed
+        if (!(Input.GetKey(KeyCode.D)
+            || Input.GetKey(KeyCode.A)
+            || Input.GetKey(KeyCode.W)
+            || Input.GetKey(KeyCode.S)))
+        {
+            if (movementSpeed >= 0)
+            {
+                movementSpeed -= deacceleration * Time.deltaTime;
+            }
+            if (movementSpeed <= 0)
+            {
+                movementSpeed += deacceleration * Time.deltaTime;
+            }
+
+        }
+    }
+    //Dash Procedures, tempoariily increases movement speed for a brief period of time.
+    private IEnumerator Dash(float timer)
+    {
+    if (CDTimerOff == true)
+        {
+            CDTimerOff = false;
+            movementSpeed = 15 * MoveDirection;
+            yield return new WaitForSeconds(timer);
+            
+        }
+        
+
+    }
+    //Cooldown timer for the dash
+    private IEnumerator CDTimer()
+    {
+        yield return new WaitForSeconds(2);
+        CDTimerOff = true;
+
+    }
+   
+
+
+}
 
 
 
